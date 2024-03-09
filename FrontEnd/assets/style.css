@@ -215,6 +215,12 @@ footer nav ul {
 
 /* Ajout du css pour la page de login */
 
+.main_container_login {
+	min-height: 100vh;
+	display: grid;
+	grid-template-rows: 1fr auto;
+}
+
 nav li a {
 	text-decoration: none;
 	color: black;
