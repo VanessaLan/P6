@@ -2,12 +2,23 @@ import { LogInOut } from "/assets/login.js"
 LogInOut()
 
 
+// Récupération du tableau des travaux
+
+let worksTableau = null
+
+async function getWorksTableau(refresh) { 
+    if (worksTableau === null || refresh === true) {
+        worksTableau = await fetch("http://localhost:5678/api/works")
+        .then(worksTableau => worksTableau.json())
+    }
+    return worksTableau
+}
+await getWorksTableau(false)
+
+
 // Création de la gallerie
 
-async function genererGallery() {
-
-    let worksTableau = await fetch("http://localhost:5678/api/works")
-        .then(worksTableau => worksTableau.json())
+function genererGallery() {
 
     for (let i = 0; i < worksTableau.length; i++) {
 
@@ -26,7 +37,7 @@ async function genererGallery() {
         nouvelElementFigure.appendChild(nouvelElementFigcaption)
     }
 }
-genererGallery()
+genererGallery(false)
 
 
 // Récupération du tableau de l'API pour les filtres
@@ -186,10 +197,7 @@ if (localStorage.monToken) {
 
     // Ajout de la galerie photo dans la modale
 
-    async function genererGalleryModal() {
-
-        let worksTableau = await fetch("http://localhost:5678/api/works")
-            .then(worksTableau => worksTableau.json())
+    function genererGalleryModal() {
 
         for (let i = 0; i < worksTableau.length; i++) {
 
@@ -217,19 +225,21 @@ if (localStorage.monToken) {
         }
     }
 
-    function deleteElement(id) {
+    async function deleteElement(id) {
         let token = localStorage.getItem("monToken")
 
-        fetch(`http://localhost:5678/api/works/${id}`, {
+        await fetch(`http://localhost:5678/api/works/${id}`, {
             method: "DELETE",
             headers: { Authorization: `Bearer ${token}` }
         })
-            .then(data => mettreAJourPage(id))
+        await mettreAJourPage()
     }
 
-    function mettreAJourPage() {
+    async function mettreAJourPage() {
+
         document.querySelector(".gallery").innerHTML = ""
         document.querySelector("#gallery_modal").innerHTML = ""
+        await getWorksTableau(true)
         genererGallery()
         genererGalleryModal()
     }
@@ -237,7 +247,7 @@ if (localStorage.monToken) {
 
     // Création de la nouvelle fenêtre modale
 
-    function modal2() {
+     function modal2() {
 
         let modalContent = document.querySelector("#modal_content")
 
@@ -439,7 +449,7 @@ if (localStorage.monToken) {
 
             let formModal2 = document.getElementById("modal_form")
 
-            formModal2.addEventListener("submit", (event) => {
+            formModal2.addEventListener("submit", async (event) => {
                 event.preventDefault()
 
                 let token = localStorage.getItem("monToken")
@@ -453,20 +463,23 @@ if (localStorage.monToken) {
                 formData.append("title", title)
                 formData.append("category", category)
 
-                fetch("http://localhost:5678/api/works", {
+                await fetch("http://localhost:5678/api/works", {
                     method: "POST",
                     headers: { Authorization: `Bearer ${token}` },
                     body: formData
                 })
-                    .then(data => mettreAJourPage2())
+                await mettreAJourPage2()
             })
         }
     }
 
-    function mettreAJourPage2() {
+    async function mettreAJourPage2() {
+
         document.getElementById("modal_content").innerHTML = ""
         document.querySelector(".gallery").innerHTML = ""
+        await getWorksTableau(true)
         modal1()
         genererGallery()
+        
     }
 }
