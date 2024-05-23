@@ -37,7 +37,7 @@ function genererGallery() {
         nouvelElementFigure.appendChild(nouvelElementFigcaption)
     }
 }
-genererGallery(false)
+genererGallery()
 
 
 // Récupération du tableau de l'API pour les filtres
